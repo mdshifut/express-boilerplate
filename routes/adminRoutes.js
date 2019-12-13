@@ -60,8 +60,7 @@ router
     findAdmin,
     changePassword
   )
-  // TODO: Have to combained logout controller
-  .post('/logout', logout)
+
   .get(
     '/get-admins',
     authentication,
@@ -103,6 +102,7 @@ router
     authentication,
     findAdmin,
     editProfile
-  );
+  )
+  .post('/logout', logout);
 
 module.exports = router;

@@ -422,15 +422,6 @@ exports.changePassword = async (req, res, next) => {
 };
 
 /* ======================================================================================
-===================================== Logout =============================================
-========================================================================================= */
-exports.logout = async (req, res) => {
-  res.clearCookie('x-access-token');
-
-  return res.status(200).json({ message: 'Logout successfully' });
-};
-
-/* ======================================================================================
 /* =============================== Get all admins ===========================================
 /* ====================================================================================== */
 exports.getAllAdmins = async (req, res) => {
@@ -488,7 +479,7 @@ exports.changeSettings = async (req, res) => {
   currentUser.settings = validateValue;
 
   await currentUser.save();
-  return res.status(200).json({ message: 'Admin enable successfully' });
+  return res.status(200).json({ message: 'Settings change successfully' });
 };
 
 /* ======================================================================================
@@ -501,4 +492,13 @@ exports.editProfile = async (req, res) => {
 
   await currentUser.save();
   return res.status(200).json({ message: 'Profile update successfully' });
+};
+
+/* ======================================================================================
+===================================== Logout =============================================
+========================================================================================= */
+exports.logout = async (req, res) => {
+  res.clearCookie('x-access-token');
+
+  return res.status(200).json({ message: 'Logout successfully' });
 };

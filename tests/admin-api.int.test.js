@@ -1267,10 +1267,75 @@ describe('/api/admin', () => {
       expect(body).toHaveProperty('message', 'Admin enable successfully');
     });
   });
+
   // ==================================================================
   // ======================= change settings ========================
   // ===============================================================
   describe('PUT /change-settings', () => {
+    const exec = value => {
+      return request(server)
+        .put(`/api/admin/change-settings`)
+        .send(value);
+    };
+
+    it('should return 406 if reservationEmailNotification is not provided', async () => {
+      expect.hasAssertions();
+
+      const user = await Admin.create(dataBaseData);
+
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec({}).set('Cookie', [
+        `x-access-token=${token}`
+      ]);
+
+      expect(status).toBe(406);
+      expect(body).toHaveProperty(
+        'error.message',
+        'reservationEmailNotification is required'
+      );
+    });
+
+    it('should return 401 if user is not authenticate', async () => {
+      expect.assertions(2);
+
+      const { status, body } = await exec({
+        reservationEmailNotification: false
+      });
+
+      expect(status).toBe(401);
+      expect(body).toHaveProperty(
+        'error.message',
+        'Authentication failed. Please login'
+      );
+    });
+
+    it('should return 200 if  profile is updated', async () => {
+      expect.hasAssertions();
+
+      const user = await Admin.create(dataBaseData);
+
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec({
+        reservationEmailNotification: false
+      }).set('Cookie', [`x-access-token=${token}`]);
+
+      const updatedAdmin = await Admin.findById(user._id);
+
+      expect(status).toBe(200);
+      expect(updatedAdmin.settings).toHaveProperty(
+        'reservationEmailNotification',
+        false
+      );
+      expect(body).toHaveProperty('message', 'Settings change successfully');
+    });
+  });
+
+  // ==================================================================
+  // ======================= edit profile ========================
+  // ===============================================================
+  describe('PUT /edit-profile', () => {
     const exec = value => {
       return request(server)
         .put(`/api/admin/edit-profile`)
@@ -1347,6 +1412,33 @@ describe('/api/admin', () => {
       expect(status).toBe(200);
       expect(updatedAdmin.profile).toHaveProperty('firstName', 'Rahim');
       expect(body).toHaveProperty('message', 'Profile update successfully');
+    });
+  });
+
+  // ==================================================================
+  // ======================= logout ========================
+  // ===============================================================
+  describe('POST /logout', () => {
+    const exec = () => {
+      return request(server).post(`/api/admin/logout`);
+    };
+
+    it('should return 200 and logout the user', async () => {
+      expect.hasAssertions();
+
+      const user = await Admin.create(dataBaseData);
+
+      const token = await generateAccessToken(user);
+
+      const { status, header } = await exec().set('Cookie', [
+        `x-access-token=${token}`
+      ]);
+
+      expect(status).toBe(200);
+      expect(cookie.parse(header['set-cookie'][0])).toHaveProperty(
+        'x-access-token',
+        ''
+      );
     });
   });
 });
