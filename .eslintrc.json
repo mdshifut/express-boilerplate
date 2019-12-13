@@ -10,7 +10,7 @@
     "plugin:node/recommended",
     "node",
     "plugin:jest/all",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "plugins": ["jest", "prettier"],
   "globals": {
@@ -25,6 +25,7 @@
     "no-unused-vars": "warn",
     "import/no-commonjs": "off",
     "jest/no-hooks": "off",
+    "func-names": "off",
     "no-underscore-dangle": "off",
     "jest/prefer-spy-on": "off",
     "jest/lowercase-name": [

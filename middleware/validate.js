@@ -1,14 +1,14 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
 module.exports = validator => {
   return (req, res, next) => {
     const { error, value } = validator(req.body);
     if (error)
       return res
-        .status(400)
+        .status(406)
         .json({ error: { message: error.details[0].message } });
 
-    _.set(req, "locals.validateValue", value);
+    _.set(req, 'locals.validateValue', value);
     return next();
   };
 };

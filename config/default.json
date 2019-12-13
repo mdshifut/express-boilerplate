@@ -1,5 +1,14 @@
 {
-  "DB": "mongodb://localhost:27017/webconsult-api",
+  "DB": "",
   "JWT_SECRET_KEY": "",
-  "SERVICE_NAME": "webconsult-api"
+  "SERVICE_NAME": "rental",
+  "APP_URL": "http://localhost:3000",
+  "NO_REPLY_EMAIL": "noreply@yourdomain.com",
+  "LOGIN_EXPIRED_TIME": "30d",
+  "MAIL": {
+    "MAIL_HOST": "smtp.mailtrap.io",
+    "MAIL_PORT": "2525",
+    "MAIL_USER": "d6e51302b184e8",
+    "MAIL_PASS": "1249bc102e088d"
+  }
 }
