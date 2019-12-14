@@ -1416,6 +1416,106 @@ describe('/api/admin', () => {
   });
 
   // ==================================================================
+  // ======================= REMOVE AN admin ========================
+  // ===============================================================
+  describe('DELETE /delete-admin/:adminId', () => {
+    const exec = adminId => {
+      return request(server).delete(`/api/admin/delete-admin/${adminId}`);
+    };
+
+    it('should return 401 if user is not authenticate', async () => {
+      expect.assertions(2);
+
+      const { status, body } = await exec('5df1ce9ccd6f802cb3181e8f');
+
+      expect(status).toBe(401);
+      expect(body).toHaveProperty(
+        'error.message',
+        'Authentication failed. Please login'
+      );
+    });
+
+    it('should return 403 if user is not an admin', async () => {
+      expect.assertions(2);
+
+      const user = await Admin.create(_.omit(dataBaseData, ['role']));
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec('5df1ce9ccd6f802cb3181e8f').set(
+        'Cookie',
+        [`x-access-token=${token}`]
+      );
+
+      expect(status).toBe(403);
+      expect(body).toHaveProperty(
+        'error.message',
+        "Access denied. you aren't permitted to doing this action"
+      );
+    });
+
+    it('should return 403 if admin has no permission', async () => {
+      expect.assertions(2);
+
+      const user = await Admin.create({
+        ...dataBaseData,
+        role: 'MANAGER'
+      });
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec('5df1ce9ccd6f802cb3181e8f').set(
+        'Cookie',
+        [`x-access-token=${token}`]
+      );
+
+      expect(status).toBe(403);
+      expect(body).toHaveProperty(
+        'error.message',
+        "Access denied. you aren't permitted to doing this action"
+      );
+    });
+
+    it('should return 404 if admin not found', async () => {
+      expect.hasAssertions();
+
+      const user = await Admin.create(dataBaseData);
+
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec('5df1ce9ccd6f802cb3181e8f').set(
+        'Cookie',
+        [`x-access-token=${token}`]
+      );
+
+      expect(status).toBe(404);
+      expect(body).toHaveProperty('error.message', 'User not found');
+    });
+
+    it('should remove an admin', async () => {
+      expect.hasAssertions();
+
+      const user = await Admin.create(dataBaseData);
+      const admin = await Admin.create({
+        ...dataBaseData,
+        role: 'MANAGER',
+        email: 'mdshifut2@gmail.com',
+        isDisable: true
+      });
+
+      const token = await generateAccessToken(user);
+
+      const { status, body } = await exec(admin._id).set('Cookie', [
+        `x-access-token=${token}`
+      ]);
+
+      const updatedAdmin = await Admin.findById(admin._id);
+
+      expect(status).toBe(200);
+      expect(updatedAdmin).toBeNull();
+      expect(body).toHaveProperty('message', 'Admin remove successfully');
+    });
+  });
+
+  // ==================================================================
   // ======================= logout ========================
   // ===============================================================
   describe('POST /logout', () => {

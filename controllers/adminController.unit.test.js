@@ -17,7 +17,8 @@ const {
   disableAdmin,
   enableAdmin,
   changeSettings,
-  editProfile
+  editProfile,
+  removeAdmin
 } = require('./adminController');
 const tokenGenerator = require('../utils/tokenGenerator');
 const generateAccessToken = require('../utils/generateAccessToken');
@@ -718,6 +719,7 @@ describe('Admin controllers', () => {
       expect(res.json).toHaveBeenCalledTimes(1);
     });
   });
+
   // ===================================== Get all admins  ==========================================
   // ==================================================================================================
   describe('getAllAdmins', () => {
@@ -739,6 +741,7 @@ describe('Admin controllers', () => {
       expect(res.json).toHaveBeenCalledTimes(1);
     });
   });
+
   // ===================================== Change sub admin rules   ==========================================
   // ==================================================================================================
   describe('changeRole', () => {
@@ -782,6 +785,7 @@ describe('Admin controllers', () => {
       expect(res.json).toHaveBeenCalledTimes(1);
     });
   });
+
   // ===================================== Enable sub admin     ==========================================
   // ==================================================================================================
   describe('enableAdmin', () => {
@@ -851,6 +855,44 @@ describe('Admin controllers', () => {
       await editProfile(req, res);
 
       expect(mockSave).toHaveBeenCalledTimes(1);
+      expect(res.status).toHaveBeenCalledTimes(1);
+      expect(res.json).toHaveBeenCalledTimes(1);
+    });
+  });
+  // ===================================== Remove an admin/ delete and admin      ==========================================
+  // ==================================================================================================
+  describe('removeAdmin', () => {
+    it('should return 400 if the admin is a Root admin', async () => {
+      expect.hasAssertions();
+      const req = {};
+      _.set(req, 'locals', {
+        currentUser: { role: 'ROOT_ADMIN' }
+      });
+
+      const next = jest.fn();
+      await removeAdmin(req, {}, next);
+
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+    it('should return 200 and remove the admin', async () => {
+      expect.hasAssertions();
+      const req = {};
+      const remove = jest.fn().mockResolvedValueOnce();
+      _.set(req, 'locals', {
+        currentUser: {
+          role: 'MANAGER',
+          remove
+        }
+      });
+
+      const res = {
+        status: jest.fn(() => res),
+        json: jest.fn(() => res)
+      };
+
+      await removeAdmin(req, res, {});
+
+      expect(remove).toHaveBeenCalledTimes(1);
       expect(res.status).toHaveBeenCalledTimes(1);
       expect(res.json).toHaveBeenCalledTimes(1);
     });

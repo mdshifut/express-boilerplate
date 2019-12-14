@@ -14,7 +14,8 @@ const {
   disableAdmin,
   enableAdmin,
   changeSettings,
-  editProfile
+  editProfile,
+  removeAdmin
 } = require('../controllers/adminController');
 
 const {
@@ -102,6 +103,13 @@ router
     authentication,
     findAdmin,
     editProfile
+  )
+  .delete(
+    '/delete-admin/:adminId',
+    authentication,
+    adminPermission('ROOT_ADMIN'),
+    findAdmin,
+    removeAdmin
   )
   .post('/logout', logout);
 

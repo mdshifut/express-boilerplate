@@ -495,7 +495,20 @@ exports.editProfile = async (req, res) => {
 };
 
 /* ======================================================================================
-===================================== Logout =============================================
+/* ======================  Remove an admin/ delete and admin account ====================
+/* ====================================================================================== */
+exports.removeAdmin = async (req, res, next) => {
+  const { currentUser } = req.locals;
+
+  if (currentUser.role === 'ROOT_ADMIN')
+    return next(createError(400, 'Root admin is not remove able'));
+
+  await currentUser.remove();
+  return res.status(200).json({ message: 'Admin remove successfully' });
+};
+
+/* ======================================================================================
+===================================== Logout ============================================
 ========================================================================================= */
 exports.logout = async (req, res) => {
   res.clearCookie('x-access-token');
